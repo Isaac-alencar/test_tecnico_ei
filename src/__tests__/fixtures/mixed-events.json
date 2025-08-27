@@ -1,0 +1,77 @@
+{
+  "events": [
+    {
+      "id": "evt_001",
+      "type": "sent",
+      "email": "user1@example.com",
+      "site": "newsletter.com",
+      "timestamp": "2024-01-20T10:00:00Z",
+      "metadata": { "campaign": "welcome", "template": "v1" }
+    },
+    {
+      "id": "evt_002",
+      "type": "open",
+      "email": "user2@example.com",
+      "site": "newsletter.com",
+      "timestamp": "2024-01-20T10:05:00Z",
+      "metadata": { "ip": "192.168.1.1" }
+    },
+    {
+      "id": "evt_003",
+      "type": "click",
+      "email": "user3@example.com",
+      "site": "promo.com",
+      "timestamp": "2024-01-20T10:10:00Z",
+      "metadata": { "url": "https://example.com/offer" }
+    },
+    {
+      "id": "evt_004",
+      "type": "sent",
+      "email": "user4@example.com",
+      "site": "alerts.com",
+      "timestamp": "2024-01-20T10:15:00Z"
+    },
+    {
+      "id": "evt_005",
+      "type": "bounce",
+      "email": "invalid@domain.com",
+      "site": "newsletter.com",
+      "timestamp": "2024-01-20T10:20:00Z",
+      "metadata": { "reason": "mailbox_full" }
+    },
+    {
+      "id": "evt_006",
+      "email": "user6@example.com",
+      "site": "newsletter.com",
+      "timestamp": "2024-01-20T10:25:00Z"
+    },
+    {
+      "id": "evt_007",
+      "type": "unsubscribe",
+      "email": "user7@example.com",
+      "site": "newsletter.com",
+      "timestamp": "2024-01-20T10:30:00Z",
+      "metadata": { "reason": "too_frequent" }
+    },
+    {
+      "id": "evt_008",
+      "type": "open",
+      "email": "user8@example.com",
+      "site": "promo.com",
+      "timestamp": "2024-01-20T10:35:00Z"
+    },
+    {
+      "id": "evt_009",
+      "type": "sent",
+      "timestamp": "2024-01-20T10:40:00Z"
+    },
+    {
+      "id": "evt_010",
+      "type": "complaint",
+      "email": "user10@example.com",
+      "site": "alerts.com",
+      "timestamp": "2024-01-20T10:45:00Z",
+      "metadata": { "provider": "gmail", "category": "spam" }
+    }
+  ]
+}
