@@ -6,17 +6,31 @@ interface HealthStatus {
   status: "healthy" | "unhealthy";
   timestamp: string;
   version: string;
+  uptime: number;
+  environment: string;
   database: {
     status: "connected" | "disconnected";
     responseTime?: number;
   };
+  memory: {
+    used: number;
+    total: number;
+    percentage: string;
+  };
 }
 
 interface Metrics {
-  requests: Record<string, number>;
+  service: string;
+  timestamp: string;
+  uptime: string;
+  requests: {
+    total: number;
+    errors: number;
+    errorRate: string;
+    avgResponseTime: string;
+  };
+  endpoints: Record<string, number>;
   statusCodes: Record<number, number>;
-  totalRequests: number;
-  uptime: number;
 }
 
 async function fetchHealth(): Promise<HealthStatus> {
@@ -97,27 +111,52 @@ export default function MetricsPage() {
                 />
                 <span className="font-medium capitalize">{health.status}</span>
               </div>
-              <p>
-                <span className="font-medium">Version:</span> {health.version}
-              </p>
-              <p>
-                <span className="font-medium">Database:</span>{" "}
-                <span
-                  className={
-                    health.database.status === "connected"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }
-                >
-                  {health.database.status}
-                </span>
-                {health.database.responseTime && (
-                  <span className="ml-2 text-gray-600">
-                    ({health.database.responseTime}ms)
-                  </span>
-                )}
-              </p>
-              <p className="text-sm text-gray-600">
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p>
+                    <span className="font-medium">Version:</span> {health.version}
+                  </p>
+                  <p>
+                    <span className="font-medium">Environment:</span>{" "}
+                    <span className={
+                      health.environment === "production" ? "text-red-600" : "text-blue-600"
+                    }>
+                      {health.environment}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="font-medium">Uptime:</span> {formatUptime(health.uptime)}
+                  </p>
+                </div>
+                
+                <div>
+                  <p>
+                    <span className="font-medium">Memory:</span>{" "}
+                    {health.memory.used}MB / {health.memory.total}MB
+                    <span className="ml-2 text-gray-600">({health.memory.percentage})</span>
+                  </p>
+                  <p>
+                    <span className="font-medium">Database:</span>{" "}
+                    <span
+                      className={
+                        health.database.status === "connected"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {health.database.status}
+                    </span>
+                    {health.database.responseTime && (
+                      <span className="ml-2 text-gray-600">
+                        ({health.database.responseTime}ms)
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              
+              <p className="text-sm text-gray-600 pt-2 border-t">
                 Last check: {new Date(health.timestamp).toLocaleString()}
               </p>
             </div>
@@ -135,42 +174,59 @@ export default function MetricsPage() {
             <div className="space-y-4">
               <div>
                 <span className="font-medium">Total Requests:</span>{" "}
-                {metrics.totalRequests}
+                {metrics.requests.total}
               </div>
               <div>
                 <span className="font-medium">Uptime:</span>{" "}
-                {formatUptime(metrics.uptime)}
+                {metrics.uptime}
+              </div>
+              <div>
+                <span className="font-medium">Errors:</span>{" "}
+                <span className="text-red-600">{metrics.requests.errors}</span>
+                {" "}({metrics.requests.errorRate})
+              </div>
+              <div>
+                <span className="font-medium">Avg Response Time:</span>{" "}
+                {metrics.requests.avgResponseTime}
               </div>
 
               <div>
                 <h3 className="font-medium mb-2">Requests by Endpoint:</h3>
                 <div className="ml-4 space-y-1">
-                  {Object.entries(metrics.requests).map(([endpoint, count]) => (
-                    <div key={endpoint} className="text-sm">
-                      {endpoint}: {count}
-                    </div>
-                  ))}
+                  {Object.keys(metrics.endpoints).length > 0 ? (
+                    Object.entries(metrics.endpoints).map(([endpoint, count]) => (
+                      <div key={endpoint} className="text-sm">
+                        {endpoint}: {count}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-gray-500">No requests yet</div>
+                  )}
                 </div>
               </div>
 
               <div>
                 <h3 className="font-medium mb-2">Status Codes:</h3>
                 <div className="ml-4 space-y-1">
-                  {Object.entries(metrics.statusCodes).map(([code, count]) => (
-                    <div key={code} className="text-sm">
-                      <span
-                        className={
-                          code.startsWith("2")
-                            ? "text-green-600"
-                            : code.startsWith("4") || code.startsWith("5")
-                              ? "text-red-600"
-                              : ""
-                        }
-                      >
-                        {code}: {count}
-                      </span>
-                    </div>
-                  ))}
+                  {Object.keys(metrics.statusCodes).length > 0 ? (
+                    Object.entries(metrics.statusCodes).map(([code, count]) => (
+                      <div key={code} className="text-sm">
+                        <span
+                          className={
+                            code.startsWith("2")
+                              ? "text-green-600"
+                              : code.startsWith("4") || code.startsWith("5")
+                                ? "text-red-600"
+                                : ""
+                          }
+                        >
+                          {code}: {count}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-gray-500">No requests yet</div>
+                  )}
                 </div>
               </div>
             </div>

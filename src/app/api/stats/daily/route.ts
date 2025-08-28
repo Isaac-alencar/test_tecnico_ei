@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordRequest } from "@/lib/metrics";
 
 export async function GET(request: NextRequest) {
+  const startTime = Date.now();
+  
   try {
     const today = new Date();
     const startOfDay = new Date(today);
@@ -60,8 +63,14 @@ export async function GET(request: NextRequest) {
       event_types: stats.event_types,
     }));
 
+    const responseTime = Date.now() - startTime;
+    recordRequest("/api/stats/daily", 200, responseTime);
+    
     return NextResponse.json({ data });
   } catch (error) {
+    const responseTime = Date.now() - startTime;
+    recordRequest("/api/stats/daily", 500, responseTime);
+    
     return NextResponse.json(
       { error: "Failed to fetch daily stats" },
       { status: 500 },

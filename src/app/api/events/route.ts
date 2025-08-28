@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
+import { recordRequest } from "@/lib/metrics";
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  
   try {
     const body = await request.json();
     const { events } = body;
 
     if (!events || !Array.isArray(events)) {
+      const responseTime = Date.now() - startTime;
+      recordRequest("/api/events", 400, responseTime);
+      
       return NextResponse.json(
         { error: "Events array is required" },
         { status: 400 },
@@ -60,6 +66,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const responseTime = Date.now() - startTime;
+    recordRequest("/api/events", 201, responseTime);
+    
     logger.info("Events processed", {
       totalEvents: events.length,
       validEvents: validEvents.length,
@@ -77,6 +86,9 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
+    const responseTime = Date.now() - startTime;
+    recordRequest("/api/events", 500, responseTime);
+    
     logger.error("Failed to process events", error);
     return NextResponse.json(
       { error: "Failed to process events" },

@@ -25,6 +25,9 @@ export function recordRequest(endpoint: string, statusCode: number, responseTime
     }
     metrics.avgResponseTime = metrics.requestTimes.reduce((a, b) => a + b, 0) / metrics.requestTimes.length;
   }
+  
+  // Simple debug log
+  console.log(`[METRICS] ${endpoint} ${statusCode} (Total: ${metrics.totalRequests})`);
 }
 
 export function getMetrics() {

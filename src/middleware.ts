@@ -31,14 +31,13 @@ export function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith("/api/")) {
     const responseTime = Date.now() - startTime;
-    const status = response.status || 200;
-
-    recordRequest(request.nextUrl.pathname, status, responseTime);
+    // Record successful requests (middleware doesn't have access to final status)
+    recordRequest(request.nextUrl.pathname, 200, responseTime);
 
     logger.info("API request", {
       method: request.method,
       path: request.nextUrl.pathname,
-      status,
+      status: 200,
       responseTime: `${responseTime}ms`,
     });
   }
@@ -47,5 +46,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  matcher: [
+    "/api/(.*)",
+  ],
 };
