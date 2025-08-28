@@ -19,10 +19,9 @@ npm install
 cp .env.example .env
 
 # Start database
-npm run db:up
+src/scripts/setup-db.sh
 
-# Run migrations and seed
-npm run db:migrate
+# Run seed
 npm run db:seed
 
 # Start development server
@@ -41,7 +40,7 @@ All API requests require `x-api-key` header with valid API key.
 - `GET /api/stats/daily` - Daily statistics by site
 - `GET /api/health` - Full health check
 - `GET /api/health/live` - Liveness probe
-- `GET /api/health/ready` - Readiness probe  
+- `GET /api/health/ready` - Readiness probe
 - `GET /api/metrics` - Service metrics
 - `GET /api/info` - Service information
 
@@ -56,7 +55,7 @@ curl -X POST http://localhost:3000/api/events \
       {
         "id": "evt_001",
         "type": "sent",
-        "email": "user@example.com", 
+        "email": "user@example.com",
         "site": "site-a.com",
         "timestamp": "2024-01-20T10:30:00Z"
       }
@@ -93,7 +92,7 @@ Test coverage includes API endpoints, middleware, and error handling scenarios.
 
 ### Tech Stack
 - **Next.js 15**: App Router for API routes and frontend
-- **PostgreSQL + Prisma**: Database with type-safe ORM  
+- **PostgreSQL + Prisma**: Database with type-safe ORM
 - **Tailwind CSS**: Utility-first styling
 - **Vitest**: Fast testing framework
 - **React Query**: Data fetching and caching
@@ -103,7 +102,7 @@ Test coverage includes API endpoints, middleware, and error handling scenarios.
 #### 1. Batch Processing
 Events are validated in bulk before database operations to reduce iterations and improve performance.
 
-#### 2. Simple Authentication  
+#### 2. Simple Authentication
 API key validation via environment variables with hardcoded fallback for development simplicity.
 
 #### 3. In-Memory Metrics
@@ -114,7 +113,7 @@ JSON-formatted logs with timestamps and context for better observability without
 
 #### 5. Health Check Separation
 - **Liveness**: Basic service availability
-- **Readiness**: Database connectivity check  
+- **Readiness**: Database connectivity check
 - **Full Health**: Complete system status
 
 ## Project Structure
@@ -160,7 +159,7 @@ These limitations are acceptable for MVP/assessment context but would need addre
 # Database
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/everinbox_dev"
 
-# Authentication  
+# Authentication
 API_KEYS="sk_test_123456789,sk_dev_abcdefghijk"
 
 # Runtime
@@ -172,7 +171,7 @@ NODE_ENV="development"
 ```bash
 # Development
 npm run dev              # Start dev server
-npm run build           # Build for production  
+npm run build           # Build for production
 npm run start           # Start production server
 
 # Database
