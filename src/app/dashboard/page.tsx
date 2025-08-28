@@ -56,7 +56,15 @@ export default function Dashboard() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Daily Stats Dashboard</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Daily Stats Dashboard</h1>
+        <a
+          href="/metrics"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          API status
+        </a>
+      </div>
 
       {stats.length === 0 ? (
         <p>No data available for today.</p>
