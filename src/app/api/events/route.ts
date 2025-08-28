@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,18 +14,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let processed = 0;
-    let duplicates = 0;
     const errors: string[] = [];
 
-    for (const event of events) {
+    // Batch validation - filter valid events upfront
+    const validEvents = events.filter((event) => {
+      const { id, type, email, site, timestamp } = event;
+      if (!id || !type || !email || !site || !timestamp) {
+        errors.push(`Missing required fields for event ${id || "unknown"}`);
+        return false;
+      }
+      return true;
+    });
+
+    let processed = 0;
+    let duplicates = 0;
+
+    // Process valid events (optimized with simple duplicate check)
+    for (const event of validEvents) {
       try {
         const { id, type, email, site, timestamp, metadata } = event;
-
-        if (!id || !type || !email || !site || !timestamp) {
-          errors.push(`Missing required fields for event ${id || "unknown"}`);
-          continue;
-        }
 
         const existingEvent = await prisma.event.findUnique({
           where: { id },
@@ -52,6 +60,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    logger.info("Events processed", {
+      totalEvents: events.length,
+      validEvents: validEvents.length,
+      processed,
+      duplicates,
+      errorCount: errors.length
+    });
+
     return NextResponse.json(
       {
         processed,
@@ -61,6 +77,7 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
+    logger.error("Failed to process events", error);
     return NextResponse.json(
       { error: "Failed to process events" },
       { status: 500 },

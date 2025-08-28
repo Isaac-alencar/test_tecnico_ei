@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { logger } from "./logger";
 
 export interface HealthStatus {
   status: "healthy" | "unhealthy";
@@ -18,6 +19,10 @@ export class HealthService {
     const databaseStatus = await this.checkDatabase();
 
     const isHealthy = databaseStatus.status === "connected";
+
+    if (!isHealthy) {
+      logger.error("Health check failed", { database: databaseStatus });
+    }
 
     return {
       status: isHealthy ? "healthy" : "unhealthy",
